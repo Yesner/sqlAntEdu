@@ -1,0 +1,34 @@
+DELIMITER $$
+
+CREATE PROCEDURE testInsertarItem(
+
+IN p_NUMERO INT,
+IN p_CODIGO_PRODUCTO VARCHAR(10),
+IN p_CANTIDAD INT,
+IN p_PRECIO FLOAT
+
+)
+
+BEGIN 
+
+DECLARE v_msg TEXT;
+
+   IF NOT EXISTS (SELECT 1 FROM facturas WHERE NUMERO = p_NUMERO) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La factura no existe.';
+    END IF;
+    
+       IF NOT EXISTS (SELECT 1 FROM productos WHERE CODIGO = p_CODIGO_PRODUCTO) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El producto no existe.';
+    END IF;
+    
+	INSERT INTO items_facturas (NUMERO, CODIGO_DEL_PRODUCTO, CANTIDAD, PRECIO)
+    VALUES (p_NUMERO, p_CODIGO_PRODUCTO, p_CANTIDAD, p_PRECIO);
+    
+	SELECT CONCAT('Item insertado en factura ', p_NUMERO, ' con producto ', p_CODIGO_PRODUCTO) AS mensaje;
+    
+    END $$
+    
+DELIMITER ;
+
+
+CALL testInsertarItem(87977, '1004327', 2,19.51); 
